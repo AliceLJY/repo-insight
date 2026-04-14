@@ -1,0 +1,12 @@
+{
+  "name": "repo-insight",
+  "version": "1.0.0",
+  "description": "Deep architectural analysis of open-source projects with design insights and trade-off analysis",
+  "author": "AliceLJY",
+  "skills": [
+    {
+      "name": "repo-insight",
+      "path": "skills/repo-insight/SKILL.md"
+    }
+  ]
+}

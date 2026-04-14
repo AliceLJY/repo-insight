@@ -1,0 +1,20 @@
+{
+  "name": "repo-insight",
+  "version": "1.0.0",
+  "description": "AI coding agent skill for deep architectural analysis of open-source projects",
+  "keywords": [
+    "claude-code",
+    "skill",
+    "architecture-analysis",
+    "code-review",
+    "open-source",
+    "repo-analysis"
+  ],
+  "author": "AliceLJY",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AliceLJY/repo-insight.git"
+  },
+  "homepage": "https://github.com/AliceLJY/repo-insight"
+}

@@ -1,0 +1,124 @@
+# Repo Insight
+
+AI coding agent skill for deep architectural analysis of open-source projects. Goes beyond "what technologies are used" to answer "why is it designed this way."
+
+Generates professional architecture reports with design insights, trade-off analysis, borrowing value assessment, and Mermaid diagrams.
+
+Compatible with [Claude Code](https://claude.ai/claude-code), [Codex](https://github.com/openai/codex), [OpenClaw](https://github.com/anthropics/openclaw), and any AI coding agent that supports the skills format.
+
+**[中文文档](README.zh.md)**
+
+## Quick Install
+
+**npx (Recommended)**
+
+```bash
+npx skills add AliceLJY/repo-insight
+```
+
+**Manual (Git Clone)**
+
+```bash
+# macOS / Linux
+git clone https://github.com/AliceLJY/repo-insight.git ~/.claude/skills/repo-insight
+
+# Windows
+git clone https://github.com/AliceLJY/repo-insight.git %USERPROFILE%\.claude\skills\repo-insight
+```
+
+## Features
+
+- **Why > What Philosophy** — Every design decision explains motivation, trade-offs, and alternatives
+- **Adaptive Report Structure** — No fixed template; chapters are dynamically designed based on each project's characteristics
+- **Parallel Subagent Analysis** — Spawns multiple agents for concurrent module analysis with coverage tracking
+- **External Research** — Web searches for reviews + crawls official websites before diving into code
+- **Interactive Q&A** — Generates targeted questions based on project traits, not a fixed checklist
+- **Quality Scorecard** — Visual star-rating evaluation card with justified scores
+- **Borrowing Value** — Explicit section on reusable design patterns and engineering practices worth learning
+- **Mermaid Diagrams** — Architecture overviews, data flows, and per-module sequence diagrams
+- **4 Depth Levels** — From 30-second quick verdict to full deep analysis
+
+## Usage
+
+Simply ask Claude Code to analyze a project:
+
+```
+分析项目 https://github.com/astral-sh/ruff
+```
+
+```
+/repo-insight ollama/ollama
+```
+
+```
+对比分析 express vs fastify
+```
+
+The skill accepts `owner/repo` shorthand, full GitHub/GitLab/Gitee URLs, or local paths.
+
+## Analysis Modes
+
+| Mode | Core Coverage | Secondary Coverage | Best For |
+|------|--------------|-------------------|----------|
+| **Quick Verdict** | Entry + README | — | 30-second go/no-go decision |
+| **Quick Analysis** | >= 30% | >= 10% | High-level overview |
+| **Standard** (default) | >= 60% | >= 30% | Regular architecture analysis |
+| **Deep Analysis** | >= 90% | >= 60% | Studying every design decision |
+| **Comparative** | Varies | Varies | Side-by-side project comparison |
+
+## How It Works
+
+1. **Clone & Scan** — Clones the repo, counts effective lines of code by module
+2. **Scale Assessment** — Reports codebase size, lets you choose analysis depth
+3. **External Research** — Web searches + official website crawling + project docs
+4. **Adaptive Q&A** — Generates targeted questions based on project characteristics
+5. **Dynamic Report Design** — Designs chapter structure based on your answers
+6. **Parallel Deep Analysis** — Spawns subagents for concurrent module analysis
+7. **Cross-Validation** — Coverage checks + conclusion verification across modules
+8. **Multi-Source Fusion** — Merges everything into a cohesive narrative with quality scorecard
+
+## Report Output
+
+Final reports are saved at:
+
+```
+~/repo-analyses/{project-name}-{date}/ANALYSIS_REPORT.md
+```
+
+Every report includes (adapted per project):
+
+- **Problem Context** — What problem does this solve? Why do existing solutions fall short?
+- **Competitive Positioning** — Design philosophy differences (not feature checklists)
+- **Project Overview** — Architecture at a glance
+- **Deep Module Analysis** — Why > What, with trade-offs and industry comparisons
+- **Borrowing Value** — Reusable design patterns, engineering practices, and pitfalls to avoid
+- **Quality Scorecard** — Star-rated evaluation card with justified assessments
+- **Architecture Diagrams** — Mermaid charts throughout
+
+## File Structure
+
+```
+repo-insight/
+├── skills/
+│   └── repo-insight/
+│       ├── SKILL.md                        # Main skill definition
+│       └── references/
+│           ├── analysis-guide.md           # Analysis philosophy & evaluation framework
+│           └── module-analysis-guide.md    # Module analysis & subagent templates
+├── .claude-plugin/
+│   └── plugin.json                         # Plugin metadata
+├── package.json                            # Package manifest
+├── README.md                               # English documentation
+├── README.zh.md                            # Chinese documentation
+└── LICENSE                                 # MIT License
+```
+
+## Contributing
+
+Contributions are welcome! Feel free to open issues or submit pull requests.
+
+The core logic lives in `skills/repo-insight/SKILL.md`. The evaluation framework and subagent templates are in the `references/` directory.
+
+## License
+
+[MIT](LICENSE)
