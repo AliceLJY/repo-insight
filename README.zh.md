@@ -4,7 +4,7 @@ AI 编码助手技能，用于开源项目深度架构分析。不止于"用了�
 
 生成有深度洞察的专业架构报告，包含设计权衡分析、借鉴价值评估和 Mermaid 架构图。
 
-兼容 [Claude Code](https://claude.ai/claude-code)、[Codex](https://github.com/openai/codex)、[OpenClaw](https://github.com/anthropics/openclaw) 及任何支持 skills 格式的 AI 编码助手。
+兼容 [Claude Code](https://claude.ai/claude-code)、[Codex](https://github.com/openai/codex) 及任何支持 skills 格式的 AI 编码助手。
 
 ## 快速安装
 

@@ -4,7 +4,7 @@ AI coding agent skill for deep architectural analysis of open-source projects. G
 
 Generates professional architecture reports with design insights, trade-off analysis, borrowing value assessment, and Mermaid diagrams.
 
-Compatible with [Claude Code](https://claude.ai/claude-code), [Codex](https://github.com/openai/codex), [OpenClaw](https://github.com/anthropics/openclaw), and any AI coding agent that supports the skills format.
+Compatible with [Claude Code](https://claude.ai/claude-code), [Codex](https://github.com/openai/codex), and any AI coding agent that supports the skills format.
 
 **[中文文档](README.zh.md)**
 
