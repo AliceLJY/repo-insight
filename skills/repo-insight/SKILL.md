@@ -17,6 +17,19 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 
 ## 核心原则
 
+### 0. 临床意义 > 统计学意义（审计第一问，先于一切代码阅读）
+
+医学类比：统计学显著 ≠ 临床获益。代码写得完美但项目不起作用，审阅就是失败的。
+
+**动手读代码前必做**：
+- 拉采用现实：npm 下载量（`api.npmjs.org/downloads/point/last-month/<pkg>`）、star/fork、owner 仓库加 `gh api .../traffic/views`
+- **完整读 issues/PR 列表**——外部 issue 是金子级临床信号，真实病人的主诉优先于一切假想优化
+- 回答三个临床问题：①临床终点是什么（作者自用 / 作品集叙事 / 生态采用）②真实用户是谁、有几个 ③瓶颈在代码还是在 discovery / 生态错位
+
+**输出纪律**：改进建议按"对真实用户的真实获益"排序，不按工程完美度；"竞品都这么做"不构成临床理由；为不存在的用户做的完善 = 统计学修饰，必须明说；验证要覆盖**发布产物**（npm pack 实装测试），源码审计看不见打包病。
+
+案例：babel-memory 2026-06-11——9 项"深度审计"发现全是工程视角，唯一真实外部用户报的 P0 级 bug（发布产物内联依赖+硬编码打包机路径，核心功能在外部全平台静默失效）躺在 issue 列表里 5 天没被审计发现。详见 memory/feedback_clinical_review_lens.md。
+
 ### 1. Why > What（强制）
 
 每个设计决策必须解释动机、权衡、替代方案代价。
