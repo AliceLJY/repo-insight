@@ -1,12 +1,12 @@
 {
   "name": "repo-insight",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Deep architectural analysis of open-source projects with design insights and trade-off analysis",
-  "author": "AliceLJY",
+  "author": {
+    "name": "AliceLJY",
+    "url": "https://github.com/AliceLJY"
+  },
   "skills": [
-    {
-      "name": "repo-insight",
-      "path": "skills/repo-insight/SKILL.md"
-    }
+    "./skills/repo-insight"
   ]
 }

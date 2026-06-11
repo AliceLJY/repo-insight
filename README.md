@@ -4,7 +4,9 @@ AI coding agent skill for deep architectural analysis of open-source projects. G
 
 Generates professional architecture reports with design insights, trade-off analysis, borrowing value assessment, and Mermaid diagrams.
 
-Compatible with [Claude Code](https://claude.ai/claude-code), [Codex](https://github.com/openai/codex), and any AI coding agent that supports the skills format.
+Compatible with [Claude Code](https://claude.ai/claude-code), [Codex](https://github.com/openai/codex), and any AI coding agent that supports the skills format. Interactive questions and parallel subagents degrade gracefully when those tools are unavailable — see the "运行环境降级" (runtime degradation) section in SKILL.md.
+
+> **Language note**: The skill instructions are written in Chinese (the author's working language). Report output follows your conversation language, but the skill works best in Chinese conversations. An English instruction set may come later if there is demand.
 
 **[中文文档](README.zh.md)**
 
@@ -16,15 +18,21 @@ Compatible with [Claude Code](https://claude.ai/claude-code), [Codex](https://gi
 npx skills add AliceLJY/repo-insight
 ```
 
-**Manual (Git Clone)**
+**Manual (Git Clone + Symlink)**
+
+The skill lives in a nested `skills/repo-insight/` directory, so clone the repo anywhere and link the inner directory into your skills folder (cloning the whole repo directly into `~/.claude/skills/` will NOT work — Claude Code expects `SKILL.md` at the top level of each skill directory):
 
 ```bash
 # macOS / Linux
-git clone https://github.com/AliceLJY/repo-insight.git ~/.claude/skills/repo-insight
+git clone https://github.com/AliceLJY/repo-insight.git ~/repo-insight
+ln -s ~/repo-insight/skills/repo-insight ~/.claude/skills/repo-insight
 
-# Windows
-git clone https://github.com/AliceLJY/repo-insight.git %USERPROFILE%\.claude\skills\repo-insight
+# Windows (junction, no admin required)
+git clone https://github.com/AliceLJY/repo-insight.git %USERPROFILE%\repo-insight
+mklink /J %USERPROFILE%\.claude\skills\repo-insight %USERPROFILE%\repo-insight\skills\repo-insight
 ```
+
+**Verify**: start a new Claude Code session and run `/repo-insight`, or just ask `分析项目 <some-repo>` — the skill should activate.
 
 ## Features
 
@@ -85,6 +93,8 @@ Final reports are saved at:
 ~/repo-analyses/{project-name}-{date}/ANALYSIS_REPORT.md
 ```
 
+Exception: borrowing-audit mode writes to `{your_project}/docs/pipeline-audit-{reference-name}.md` instead, since its output belongs to the project being improved. Note that `~/repo-analyses/` is a per-machine local directory — it does not sync across machines.
+
 Every report includes (adapted per project):
 
 - **Problem Context** — What problem does this solve? Why do existing solutions fall short?
@@ -118,6 +128,8 @@ repo-insight/
 Contributions are welcome! Feel free to open issues or submit pull requests.
 
 The core logic lives in `skills/repo-insight/SKILL.md`. The evaluation framework and subagent templates are in the `references/` directory.
+
+Maintainer note: do not run `npx skills add` from this repository's root for self-testing — it mutates the working tree (creates `.agents/` and `skills-lock.json`, and replaces `skills/repo-insight` with a symlink). Run it from a separate agent workspace instead.
 
 ## License
 

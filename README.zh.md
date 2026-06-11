@@ -4,7 +4,9 @@ AI 编码助手技能，用于开源项目深度架构分析。不止于"用了�
 
 生成有深度洞察的专业架构报告，包含设计权衡分析、借鉴价值评估和 Mermaid 架构图。
 
-兼容 [Claude Code](https://claude.ai/claude-code)、[Codex](https://github.com/openai/codex) 及任何支持 skills 格式的 AI 编码助手。
+兼容 [Claude Code](https://claude.ai/claude-code)、[Codex](https://github.com/openai/codex) 及任何支持 skills 格式的 AI 编码助手。交互提问和并行 subagent 在工具不可用时自动降级，详见 SKILL.md「运行环境降级」一节。
+
+**[English README](README.md)**
 
 ## 快速安装
 
@@ -14,15 +16,21 @@ AI 编码助手技能，用于开源项目深度架构分析。不止于"用了�
 npx skills add AliceLJY/repo-insight
 ```
 
-**手动安装（Git Clone）**
+**手动安装（Git Clone + 软链接）**
+
+技能本体在嵌套的 `skills/repo-insight/` 目录里，所以要把仓库 clone 到任意位置后，将内层目录链接进 skills 文件夹（把整个仓库直接 clone 进 `~/.claude/skills/` 是**不行**的——Claude Code 要求每个技能目录顶层就有 `SKILL.md`）：
 
 ```bash
 # macOS / Linux
-git clone https://github.com/AliceLJY/repo-insight.git ~/.claude/skills/repo-insight
+git clone https://github.com/AliceLJY/repo-insight.git ~/repo-insight
+ln -s ~/repo-insight/skills/repo-insight ~/.claude/skills/repo-insight
 
-# Windows
-git clone https://github.com/AliceLJY/repo-insight.git %USERPROFILE%\.claude\skills\repo-insight
+# Windows（junction，无需管理员权限）
+git clone https://github.com/AliceLJY/repo-insight.git %USERPROFILE%\repo-insight
+mklink /J %USERPROFILE%\.claude\skills\repo-insight %USERPROFILE%\repo-insight\skills\repo-insight
 ```
+
+**验证安装**：新开一个 Claude Code 会话，运行 `/repo-insight` 或直接说 `分析项目 <某个仓库>`，技能应被激活。
 
 ## 核心特性
 
@@ -83,6 +91,8 @@ git clone https://github.com/AliceLJY/repo-insight.git %USERPROFILE%\.claude\ski
 ~/repo-analyses/{项目名}-{日期}/ANALYSIS_REPORT.md
 ```
 
+例外：借鉴审计模式的产出写入 `{你的项目}/docs/pipeline-audit-{参考项目名}.md`，因为它属于被改进的项目本身。另外 `~/repo-analyses/` 是单机本地目录，不跨机同步。
+
 每份报告包含（根据项目特征灵活调整）：
 
 - **场景化问题引入** — 解决什么问题？现有方案为什么不够？
@@ -116,6 +126,8 @@ repo-insight/
 欢迎提 Issue 或 PR！
 
 核心逻辑在 `skills/repo-insight/SKILL.md`，评价框架和 subagent 模板在 `references/` 目录。
+
+维护者注意：不要在本仓库根目录运行 `npx skills add` 自测——它会改写工作树（生成 `.agents/` 和 `skills-lock.json`，并把 `skills/repo-insight` 替换成软链接）。自测请在独立的 agent 工作区进行。
 
 ## 许可证
 

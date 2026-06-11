@@ -107,6 +107,18 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 
 写入 `{our_project}/docs/pipeline-audit-{reference-name}.md`，包含自审发现、参考方案、可行提案、实施计划。
 
+## 运行环境降级（非交互 / 工具缺失时必读）
+
+进入工作流前先自检运行环境。以下任一情形都**不阻断分析**，按规则降级继续：
+
+| 缺失能力 | 降级规则 |
+|---------|---------|
+| 非交互环境（Telegram bridge、`codex exec`、CI 等，AskUserQuestion 不可用或被拦截） | 跳过所有提问：阶段 2 按代码规模自动选模式（核心代码 < 5000 行 → 快速分析，否则 → 标准分析），阶段 4 跳过提问、按项目特征直接推断分析方向，阶段 5 大纲不等用户确认直接执行 |
+| 无 subagent 工具（Agent / multi_agent 均不可用） | 阶段 6 改为主 agent 串行分析核心模块，覆盖率目标降一档（深度→标准、标准→快速），并在报告中注明 |
+| 无 WebSearch / 网络受限 | 跳过阶段 3 外部调研，报告标注"未联网调研，竞品对比基于模型已有知识" |
+
+**跨 agent 工具映射**：`Agent` 是 Claude Code 的工具名；Codex 的对应能力是 `multi_agent`（工具名 `multi_agent_v1.spawn_agent` 系列），可用则等价并行执行，不可用则走串行降级。其他 agent 同理：有 subagent 能力就并行，没有就串行，不要因工具名不匹配而中断。
+
 ## 工作流
 
 ```
@@ -132,7 +144,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 ### 阶段 2: 规模评估与模式选择
 
 1. 统计有效代码行数（排除测试/构建配置/自动生成/lock文件），按模块列出分布
-2. 使用 AskUserQuestion 报告代码规模，让用户选择分析模式
+2. 使用 AskUserQuestion 报告代码规模，让用户选择分析模式（非交互环境按「运行环境降级」自动选模式，不提问）
 3. 将代码规模和选择写入 `drafts/02-plan.md`
 
 **速评模式**在此阶段直接输出结论——不走后续阶段：
@@ -164,6 +176,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 4. 使用 AskUserQuestion 提问，每次不超过 3 个问题
    - 其中一个问题确认报告开头详略（知名项目可跳过冗长介绍）
 5. 可多轮提问直到方向明确
+6. 非交互环境跳过本阶段提问，按特征直接推断分析方向（见「运行环境降级」）
 
 ### 阶段 5: 动态报告结构设计
 
@@ -328,6 +341,8 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 
 当用户询问已调研项目时，优先引用已有分析报告。
 
+**注意**：成果库是机器本地目录，不跨机同步。多机环境下既往分析可能存放在主力机上——本机目录为空不代表没有分析过，回答"是否调研过某项目"前先说明只检查了本机。
+
 ## Examples
 
 ### 速评
@@ -378,5 +393,5 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 
 ## Related Skills
 
-- **github-finder**: 项目发现器，本 skill 的上游。finder 搜项目后可链式调用本 skill 深度分析
+- **github-finder**: 项目发现器，本 skill 的上游。finder 搜项目后可链式调用本 skill 深度分析（作者本机生态的可选搭配，未随本仓库分发，没有它不影响本 skill 使用）
 - ~~**pipeline-borrower**~~: 已合并到本 skill 的"借鉴审计模式"（2026-04-21）
