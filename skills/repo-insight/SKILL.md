@@ -138,7 +138,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 
 1. 解析用户输入（支持 `owner/repo`、GitHub/GitLab/Gitee URL、本地路径）
 2. 创建工作区：`~/repo-analyses/${REPO_NAME}-{YYYYMMDD}/` 作为 `$WORK_DIR`
-3. 非本地路径则 `git clone --depth=1`
+3. 非本地路径则 `git clone --depth=1` 到 `~/.cache/repo-insight/${REPO_NAME}/`——**不要 clone 进 `$WORK_DIR`**。工作区只放分析产物（报告 + drafts），源码缓存与产物分离：成果库可能被用户放进同步盘，几百 MB 的源码缓存混进去会污染同步流量；分析结束后缓存可随时清理而不伤报告
 4. 获取元数据（Star、Fork、贡献者、最近提交活跃度）
 
 ### 阶段 2: 规模评估与模式选择
@@ -341,7 +341,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 
 当用户询问已调研项目时，优先引用已有分析报告。
 
-**注意**：成果库是机器本地目录，不跨机同步。多机环境下既往分析可能存放在主力机上——本机目录为空不代表没有分析过，回答"是否调研过某项目"前先说明只检查了本机。
+**注意**：成果库默认是机器本地目录，不跨机同步——本机目录为空不代表没有分析过，回答"是否调研过某项目"前先说明检查范围。多机用户可把 `~/repo-analyses` symlink 到自己的同步目录（如 Syncthing/iCloud），即可双机共享既往报告；工作区只存报告不存源码缓存（见阶段 1），同步流量很小。
 
 ## Examples
 

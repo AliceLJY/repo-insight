@@ -91,7 +91,7 @@ mklink /J %USERPROFILE%\.claude\skills\repo-insight %USERPROFILE%\repo-insight\s
 ~/repo-analyses/{项目名}-{日期}/ANALYSIS_REPORT.md
 ```
 
-例外：借鉴审计模式的产出写入 `{你的项目}/docs/pipeline-audit-{参考项目名}.md`，因为它属于被改进的项目本身。另外 `~/repo-analyses/` 是单机本地目录，不跨机同步。
+例外：借鉴审计模式的产出写入 `{你的项目}/docs/pipeline-audit-{参考项目名}.md`，因为它属于被改进的项目本身。另外 `~/repo-analyses/` 默认是单机本地目录——多机用户可将它 symlink 到同步目录（Syncthing、iCloud 等）实现跨机共享；工作区只存报告，源码 clone 在 `~/.cache/repo-insight/`，同步流量很小。
 
 每份报告包含（根据项目特征灵活调整）：
 

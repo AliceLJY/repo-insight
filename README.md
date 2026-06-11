@@ -93,7 +93,7 @@ Final reports are saved at:
 ~/repo-analyses/{project-name}-{date}/ANALYSIS_REPORT.md
 ```
 
-Exception: borrowing-audit mode writes to `{your_project}/docs/pipeline-audit-{reference-name}.md` instead, since its output belongs to the project being improved. Note that `~/repo-analyses/` is a per-machine local directory — it does not sync across machines.
+Exception: borrowing-audit mode writes to `{your_project}/docs/pipeline-audit-{reference-name}.md` instead, since its output belongs to the project being improved. Note that `~/repo-analyses/` is a per-machine local directory by default — multi-machine users can symlink it into a synced folder (Syncthing, iCloud, etc.). The workspace stores reports only; source clones go to `~/.cache/repo-insight/`, so sync traffic stays small.
 
 Every report includes (adapted per project):
 
