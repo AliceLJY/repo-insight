@@ -10,6 +10,8 @@ Compatible with [Claude Code](https://claude.ai/claude-code), [Codex](https://gi
 
 **[中文文档](README.zh.md)**
 
+![Sample repo-insight report — a severity-graded audit of the public babel-memory library, with evidence, real-world reproduction, and ready-to-apply fixes.](docs/assets/repo-insight-sample-report.png)
+
 ## Quick Install
 
 **npx (Recommended)**

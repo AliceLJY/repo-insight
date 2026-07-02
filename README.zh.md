@@ -8,6 +8,8 @@ AI 编码助手技能，用于开源项目深度架构分析。不止于"用了�
 
 **[English README](README.md)**
 
+![repo-insight 报告示例 —— 对公开库 babel-memory 的按严重度分级审计，附证据、真机复现和可直接落地的修复方案。](docs/assets/repo-insight-sample-report.png)
+
 ## 快速安装
 
 **npx（推荐）**
