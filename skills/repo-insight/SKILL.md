@@ -119,6 +119,13 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 
 **跨 agent 工具映射**：`Agent` 是 Claude Code 的工具名；Codex 的对应能力是 `multi_agent`（工具名 `multi_agent_v1.spawn_agent` 系列），可用则等价并行执行，不可用则走串行降级。其他 agent 同理：有 subagent 能力就并行，没有就串行，不要因工具名不匹配而中断。
 
+### 操作失败恢复（与"能力降级"相对，都是失败后的姿势）
+
+- **clone / 读文件后做否定性验证**：clone 完当场 `ls` 目录、抽一个文件 `cat` 头几行——长会话里"clone 成功 + 完整文件树 + N 行代码"整套都可能是虚构（2026-06 实录：编造 4187 行文件树、往真源码里掺不存在的文件）。`No such file` 就是戳穿信号，发现即弃当前推理、重新实际执行。
+- **gh api 元数据抓取失败**（401/超时）→ 查代理：MacBook 非交互环境先 `source ~/.proxy.env`；重试 1 次仍失败则该项标[待确认]继续分析，不阻塞。
+- **纯 gh/git/grep 抓取不派 subagent**，主上下文直跑更可靠（subagent 干这类活有 hallucinate PR 标题/作者/日期的实录）。必须派（如本 skill 阶段 6 的模块深读）→ 要求 subagent 结论带 `文件:行号` 证据，主 agent 阶段 7 抽查回源码验证（已内置）；subagent 输出里出现未来日期/对不上的元数据立即警报重查。
+- **子 agent 中途死掉/超时** → 该模块降为主 agent 串行补读（覆盖率目标降一档），报告注明，不整体重跑。
+
 ## 工作流
 
 ```
