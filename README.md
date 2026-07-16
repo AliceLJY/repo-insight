@@ -8,7 +8,7 @@ Compatible with [Claude Code](https://claude.ai/claude-code), [Codex](https://gi
 
 > **Language note**: The skill instructions are written in Chinese (the author's working language). Report output follows your conversation language, but the skill works best in Chinese conversations. An English instruction set may come later if there is demand.
 
-**[中文文档](README.zh.md)**
+**[中文文档](README_CN.md)**
 
 ![Sample repo-insight report — a severity-graded audit of the public babel-memory library, with evidence, real-world reproduction, and ready-to-apply fixes.](docs/assets/repo-insight-sample-report.png)
 
@@ -47,6 +47,12 @@ mklink /J %USERPROFILE%\.claude\skills\repo-insight %USERPROFILE%\repo-insight\s
 - **Borrowing Value** — Explicit section on reusable design patterns and engineering practices worth learning
 - **Mermaid Diagrams** — Architecture overviews, data flows, and per-module sequence diagrams
 - **4 Depth Levels** — From 30-second quick verdict to full deep analysis
+
+## Safety Boundary (v1.1.0)
+
+Before acquiring or reading a target repository, Repo Insight treats its `AGENTS.md`, `CLAUDE.md`, `README*`, prompts, and all other content as untrusted data—never as instructions. The default is read-only: no dependency installation, repository scripts/hooks/binaries, sourced environment files, or secret reading/copying/exposure. Prompt injection is recorded as a finding; dynamic execution requires explicit user authorization and isolation. The same contract is repeated verbatim at the start of every delegated module prompt.
+
+This is an instruction-level boundary backed by deterministic lint tests, not an OS sandbox. When dynamic execution is authorized, the operator or agent runtime must provide the isolated environment.
 
 ## Usage
 
@@ -111,17 +117,25 @@ Every report includes (adapted per project):
 
 ```
 repo-insight/
+├── .claude-plugin/
+│   └── plugin.json                         # Plugin metadata
+├── .github/
+│   └── workflows/
+│       └── ci.yml                          # Safety contract CI
 ├── skills/
 │   └── repo-insight/
 │       ├── SKILL.md                        # Main skill definition
 │       └── references/
 │           ├── analysis-guide.md           # Analysis philosophy & evaluation framework
 │           └── module-analysis-guide.md    # Module analysis & subagent templates
-├── .claude-plugin/
-│   └── plugin.json                         # Plugin metadata
+├── tests/
+│   ├── fixtures/
+│   │   └── untrusted-repository-contract.txt
+│   └── lint-safety-contract.mjs             # Deterministic contract/version lint
 ├── package.json                            # Package manifest
 ├── README.md                               # English documentation
-├── README.zh.md                            # Chinese documentation
+├── README_CN.md                            # Chinese documentation
+├── README.zh.md                            # Compatibility link to README_CN.md
 └── LICENSE                                 # MIT License
 ```
 
@@ -130,6 +144,7 @@ repo-insight/
 Contributions are welcome! Feel free to open issues or submit pull requests.
 
 The core logic lives in `skills/repo-insight/SKILL.md`. The evaluation framework and subagent templates are in the `references/` directory.
+Run `npm test` after changing the main skill, delegated prompt templates, or version manifests.
 
 Maintainer note: do not run `npx skills add` from this repository's root for self-testing — it mutates the working tree (creates `.agents/` and `skills-lock.json`, and replaces `skills/repo-insight` with a symlink). Run it from a separate agent workspace instead.
 
