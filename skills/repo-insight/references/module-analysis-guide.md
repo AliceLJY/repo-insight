@@ -47,6 +47,7 @@
 - 所有次要模块 → 合并到一个 Agent subagent 批量处理
 - 所有 subagent 在同一消息中并行启动
 
+<!-- repo-insight:delegated-prompt core -->
 ### 核心模块 Subagent Prompt 模板
 
 ```
@@ -94,6 +95,7 @@
 最后一行为合计行并标注达标✅/未达标❌。
 ```
 
+<!-- repo-insight:delegated-prompt secondary -->
 ### 次要模块批量 Prompt 模板
 
 ```

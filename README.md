@@ -46,7 +46,7 @@ mklink /J %USERPROFILE%\.claude\skills\repo-insight %USERPROFILE%\repo-insight\s
 - **Quality Scorecard** — Visual star-rating evaluation card with justified scores
 - **Borrowing Value** — Explicit section on reusable design patterns and engineering practices worth learning
 - **Mermaid Diagrams** — Architecture overviews, data flows, and per-module sequence diagrams
-- **4 Depth Levels** — From 30-second quick verdict to full deep analysis
+- **4 Depth Levels + 2 Specialized Modes** — Quick verdict through deep analysis, plus comparative and borrowing-audit workflows
 
 ## Safety Boundary (v1.1.0)
 
@@ -81,6 +81,7 @@ The skill accepts `owner/repo` shorthand, full GitHub/GitLab/Gitee URLs, or loca
 | **Standard** (default) | >= 60% | >= 30% | Regular architecture analysis |
 | **Deep Analysis** | >= 90% | >= 60% | Studying every design decision |
 | **Comparative** | Varies | Varies | Side-by-side project comparison |
+| **Borrowing Audit** | Targeted | Targeted | Finding evidence-backed improvements transferable to your project |
 
 ## How It Works
 

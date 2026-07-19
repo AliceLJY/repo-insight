@@ -29,9 +29,8 @@ assert.equal(
 );
 
 for (const marker of [
-  "## 核心原则",
-  "**动手读代码前必做**",
-  "### 阶段 1: 项目获取",
+  "<!-- repo-insight:principles-start -->",
+  "<!-- repo-insight:repository-acquisition -->",
 ]) {
   const markerIndex = mainSkill.indexOf(marker);
   assert.notEqual(markerIndex, -1, `${mainSkillPath} is missing ${marker}.`);
@@ -51,58 +50,64 @@ function markdownFiles(directory) {
 
 const promptTemplates = [];
 const skillDir = path.join(rootDir, "skills/repo-insight");
-const headingPattern =
-  /^#{1,6}\s+.*(?:Prompt 模板|Prompt Template).*$/gimu;
+const templateMarkerPattern =
+  /<!--\s*repo-insight:delegated-prompt\s+(core|secondary)\s*-->/giu;
 
 for (const filePath of markdownFiles(skillDir)) {
   const content = readFileSync(filePath, "utf8");
-  for (const match of content.matchAll(headingPattern)) {
-    const fenceStart = content.indexOf("```", match.index + match[0].length);
+  for (const match of content.matchAll(templateMarkerPattern)) {
+    const markerEnd = match.index + match[0].length;
+    const fenceStart = content.indexOf("```", markerEnd);
     assert.notEqual(
       fenceStart,
       -1,
-      `${path.relative(rootDir, filePath)}: ${match[0]} has no fenced prompt.`,
+      `${path.relative(rootDir, filePath)}: ${match[1]} has no fenced prompt.`,
+    );
+    const nextMarker = content.indexOf("<!-- repo-insight:delegated-prompt", markerEnd);
+    assert.ok(
+      nextMarker === -1 || fenceStart < nextMarker,
+      `${path.relative(rootDir, filePath)}: ${match[1]} must be followed by its fenced prompt.`,
     );
     const bodyStart = content.indexOf("\n", fenceStart);
     const fenceEnd = content.indexOf("\n```", bodyStart + 1);
     assert.notEqual(
       fenceEnd,
       -1,
-      `${path.relative(rootDir, filePath)}: ${match[0]} has no closing fence.`,
+      `${path.relative(rootDir, filePath)}: ${match[1]} has no closing fence.`,
     );
     promptTemplates.push({
       block: content.slice(bodyStart + 1, fenceEnd),
       file: path.relative(rootDir, filePath),
-      heading: match[0].replace(/^#{1,6}\s+/, ""),
+      id: match[1].toLowerCase(),
     });
   }
 }
 
-const requiredTemplates = [
-  "核心模块 Subagent Prompt 模板",
-  "次要模块批量 Prompt 模板",
-];
-const discoveredHeadings = new Set(
-  promptTemplates.map(({ heading }) => heading),
+const requiredTemplates = ["core", "secondary"];
+const discoveredTemplates = new Set(promptTemplates.map(({ id }) => id));
+assert.equal(
+  discoveredTemplates.size,
+  promptTemplates.length,
+  "Delegated prompt markers must be unique.",
 );
-for (const heading of requiredTemplates) {
+for (const id of requiredTemplates) {
   assert.ok(
-    discoveredHeadings.has(heading),
-    `Missing delegated prompt template: ${heading}.`,
+    discoveredTemplates.has(id),
+    `Missing delegated prompt template: ${id}.`,
   );
 }
 
-for (const { block, file, heading } of promptTemplates) {
+for (const { block, file, id } of promptTemplates) {
   const contractIndex = block.indexOf(contract);
   assert.notEqual(
     contractIndex,
     -1,
-    `${file}: ${heading} must contain the canonical safety contract.`,
+    `${file}: ${id} must contain the canonical safety contract.`,
   );
   assert.equal(
     countOccurrences(block, contract),
     1,
-    `${file}: ${heading} must contain the safety contract exactly once.`,
+    `${file}: ${id} must contain the safety contract exactly once.`,
   );
   for (const marker of [
     "## 背景信息",
@@ -113,10 +118,28 @@ for (const { block, file, heading } of promptTemplates) {
     if (markerIndex !== -1) {
       assert.ok(
         contractIndex < markerIndex,
-        `${file}: ${heading} must place the contract before ${marker}.`,
+        `${file}: ${id} must place the contract before ${marker}.`,
       );
     }
   }
+}
+
+for (const maintainerOnlyReference of [
+  /source\s+~\/\.[\w.-]+\.env/iu,
+  /详见\s+memory\//u,
+]) {
+  assert.ok(
+    !maintainerOnlyReference.test(mainSkill),
+    `${mainSkillPath} must not depend on maintainer-only files.`,
+  );
+}
+
+const gitignore = read(".gitignore");
+for (const generatedPath of [".agents/", "skills-lock.json"]) {
+  assert.ok(
+    gitignore.split(/\r?\n/u).includes(generatedPath),
+    `.gitignore must exclude ${generatedPath}.`,
+  );
 }
 
 const packageManifest = JSON.parse(read("package.json"));
