@@ -153,6 +153,17 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 2. 创建工作区：`~/repo-analyses/${REPO_NAME}-{YYYYMMDD}/` 作为 `$WORK_DIR`
 3. 非本地路径则 `git clone --depth=1` 到 `~/.cache/repo-insight/${REPO_NAME}/`——**不要 clone 进 `$WORK_DIR`**。工作区只放分析产物（报告 + drafts），源码缓存与产物分离：成果库可能被用户放进同步盘，几百 MB 的源码缓存混进去会污染同步流量；分析结束后缓存可随时清理而不伤报告
 4. 获取元数据（Star、Fork、贡献者、最近提交活跃度）
+5. **项目寿命体检（硬判据，先于任何代码阅读）**——「最近活跃度」会给出反向信号，必须配 `created_at` 一起读：
+
+   ```bash
+   gh api repos/OWNER/REPO --jq '{created:.created_at,pushed:.pushed_at,stars:.stargazers_count,watchers:.subscribers_count,issues:.open_issues_count}'
+   gh api repos/OWNER/REPO/commits --paginate -q '.[].commit.author.date[0:10]' | sort | uniq -c | sort -rn | head
+   gh api repos/OWNER/REPO/contributors -q '.[] | "\(.login) \(.contributions)"'
+   ```
+
+   **速成项目特征（命中三条以上就按速成项目评估，不按提交数/活跃度评估）**：仓库年龄 < 60 天；提交高度集中在少数几天（单日 >100 次）；单一贡献者；无 release；watcher 数远低于 star 数；`docs/` 里有 marketing/launch 文案。
+   命中不等于没价值——代码可能是真的（要抽查验证），但**"333 次提交""每天都在更新""35 份 ADR"这些指标全部失去参考意义**，成熟度只能落在"未经使用检验"。
+   出处：2026-08-31 MobaRust 实例——333 commit 全在 3 天内（单日 233 次），README、ADR、威胁模型俱全且与代码对得上，若只看活跃度会全线高分。
 
 ### 阶段 2: 规模评估与模式选择
 
@@ -288,6 +299,8 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 ```
 
 **评分维度按项目特征选择最相关的**，不必每次都用全部维度。每个维度的评价都要有具体依据。
+
+⚠️ **「工程成熟度」这一格不许用代码质量、文档齐全度、提交数或最近活跃度来打分**——这四样在 AI 速成项目上全部会虚高（见阶段 1 第 5 步的寿命体检）。这一格量的是**"被真实使用检验过多少"**：仓库年龄、release 与下载量、issue 里有没有真实用户的报错、第二个贡献者、下游依赖它的项目。全都没有就直说"未经使用检验"，别给三星糊过去。
 
 ## 借鉴价值章节
 
