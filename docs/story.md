@@ -11,7 +11,7 @@ Repo Insight 把这套要求写成 AI 照着走的流程：外部调研、规模
 
 ## 它长什么样
 
-![对我自己的公开库 babel-memory 做的审计：每条发现按严重度分级，先给证据，再给本机实测，最后给能直接用的修复](../assets/repo-insight-sample-report.png)
+![对我自己的公开库 babel-memory 做的审计：每条发现按严重度分级，先给证据，再给本机实测，最后给能直接用的修复](assets/repo-insight-sample-report.png)
 
 ## 起点
 
