@@ -152,6 +152,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 1. 解析用户输入（支持 `owner/repo`、GitHub/GitLab/Gitee URL、本地路径）
 2. 创建工作区：`~/repo-analyses/${REPO_NAME}-{YYYYMMDD}/` 作为 `$WORK_DIR`
 3. 非本地路径则 `git clone --depth=1` 到 `~/.cache/repo-insight/${REPO_NAME}/`——**不要 clone 进 `$WORK_DIR`**。工作区只放分析产物（报告 + drafts），源码缓存与产物分离：成果库可能被用户放进同步盘，几百 MB 的源码缓存混进去会污染同步流量；分析结束后缓存可随时清理而不伤报告
+   **缓存目录已存在时，不删目录、不 reset**：先 `git -C ~/.cache/repo-insight/${REPO_NAME} pull --ff-only`；失败（浅克隆接不上、上游改写了历史）就 clone 到新目录 `~/.cache/repo-insight/${REPO_NAME}-$(date +%Y%m%d)/`，旧目录收工时 `mv` 进 `~/.Trash/`。出处：07-12 写过「先删旧缓存再 clone」，09-18 写过「fetch 后强制 reset 到远端」，两次都被 makoto 判为破坏性命令——都没伤到东西，病根是「目录已存在怎么刷新」这一步没有写法，每次临场发明
 4. 获取元数据（Star、Fork、贡献者、最近提交活跃度）
 5. **项目寿命体检（硬判据，先于任何代码阅读）**——「最近活跃度」会给出反向信号，必须配 `created_at` 一起读：
 
