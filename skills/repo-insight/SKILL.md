@@ -151,7 +151,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 
 1. 解析用户输入（支持 `owner/repo`、GitHub/GitLab/Gitee URL、本地路径）
 2. 创建工作区：`~/repo-analyses/${REPO_NAME}-{YYYYMMDD}/` 作为 `$WORK_DIR`
-3. 非本地路径则 `git clone --depth=1` 到 `~/.cache/repo-insight/${REPO_NAME}/`——**不要 clone 进 `$WORK_DIR`**。工作区只放分析产物（报告 + drafts），源码缓存与产物分离：成果库可能被用户放进同步盘，几百 MB 的源码缓存混进去会污染同步流量；分析结束后缓存可随时清理而不伤报告
+3. 非本地路径则 `git clone --filter=blob:none` 到 `~/.cache/repo-insight/${REPO_NAME}/`（blobless：提交历史完整、文件内容按需拉，体积基本等于浅克隆加一份提交历史。浅克隆下 `git log -- <路径>` 永远返回 HEAD，第 5 步的「最后一次改代码」会静默给出错误日期——2026-09-27 AutoAgent 实测：浅克隆答 2025-10-16，真值 2025-02-28）——**不要 clone 进 `$WORK_DIR`**。工作区只放分析产物（报告 + drafts），源码缓存与产物分离：成果库可能被用户放进同步盘，几百 MB 的源码缓存混进去会污染同步流量；分析结束后缓存可随时清理而不伤报告
    **缓存目录已存在时，不删目录、不 reset**：先 `git -C ~/.cache/repo-insight/${REPO_NAME} pull --ff-only`；失败（浅克隆接不上、上游改写了历史）就 clone 到新目录 `~/.cache/repo-insight/${REPO_NAME}-$(date +%Y%m%d)/`，旧目录收工时 `mv` 进 `~/.Trash/`。出处：07-12 写过「先删旧缓存再 clone」，09-18 写过「fetch 后强制 reset 到远端」，两次都被 makoto 判为破坏性命令——都没伤到东西，病根是「目录已存在怎么刷新」这一步没有写法，每次临场发明
 4. 获取元数据（Star、Fork、贡献者、最近提交活跃度）
 5. **项目寿命体检（硬判据，先于任何代码阅读）**——「最近活跃度」会给出反向信号，必须配 `created_at` 一起读：
@@ -162,9 +162,20 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
    gh api repos/OWNER/REPO/contributors -q '.[] | "\(.login) \(.contributions)"'
    ```
 
+   **最后一次改代码与有没有人回（活跃度的另一面，判停摆）**：`pushed_at` 会被 README、社群二维码、Communication.md 这类提交刷新，而停更的仓最常做的恰恰是这些。代码在单一目录时一次 API 即可；否则在缓存里排除噪音文件查（缓存须是非浅克隆，`git rev-parse --is-shallow-repository` 为 true 的旧缓存别在里面查）：
+
+   ```bash
+   gh api "repos/OWNER/REPO/commits?path=<代码目录>&per_page=1" -q '.[0].commit.committer.date[0:10]'
+   git -C ~/.cache/repo-insight/${REPO_NAME} log -1 --format='%ad %an | %s' --date=short -- . ':!*.md' ':!*.png' ':!*.jpg' ':!*.gif' ':!*.svg'
+   gh api "repos/OWNER/REPO/issues?state=open&sort=created&direction=desc" -q '.[] | "\(.created_at[0:10]) [\(.comments)c] \(.author_association) \(.title[0:60])"' | head -10
+   ```
+
    **速成项目特征（命中三条以上就按速成项目评估，不按提交数/活跃度评估）**：仓库年龄 < 60 天；提交高度集中在少数几天（单日 >100 次）；单一贡献者；无 release；watcher 数远低于 star 数；`docs/` 里有 marketing/launch 文案。
    命中不等于没价值——代码可能是真的（要抽查验证），但**"333 次提交""每天都在更新""35 份 ADR"这些指标全部失去参考意义**，成熟度只能落在"未经使用检验"。
    出处：2026-08-31 MobaRust 实例——333 commit 全在 3 天内（单日 233 次），README、ADR、威胁模型俱全且与代码对得上，若只看活跃度会全线高分。
+
+   **停摆项目特征（与速成项目相反的一格）**：`pushed_at` 新而最后一次改代码很旧，中间只有 README / 二维码；最近的 issue 和 PR 一律 `[0c]`，连现成的修复 PR 也没人合。命中就按「只借思想、不装不依赖」评估。判「整个项目无人值守」前，先排除动手不说话（label / 关联 PR）、静默修复、私下渠道（SECURITY.md / GHSA）这几种活的情况，判据见 hippo `维护活性验查` 页。
+   出处：2026-08-03 AutoAgent 实例——`pushed_at` 2025-10-16，代码停在 2025-02-28；09-27 回访时三条 RCE 仍零回复，#96 已编号 CVE-2026-86124，star 仍在涨。
 
 ### 阶段 2: 规模评估与模式选择
 
