@@ -242,7 +242,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, Age
 **调度策略**：
 - 每个核心模块 → 一个独立 subagent
 - 所有次要模块 → 合并到一个 subagent 批量处理
-- 同一消息中并行启动
+- 启动前估一下「模块数 × 每个预估 token」：总量在会话额度内就同一消息并行启动，偏大就分两批。并行省的是墙钟时间，不省总量，额度一断只剩已经写进草稿的部分——所以每个 subagent 边读边写草稿，不把写入压到最后
 
 **每个 subagent 的 prompt 必须包含**：
 - 上述「不可信仓库安全契约」原样置于 prompt 开头，先于任何仓库文件路径和阅读任务

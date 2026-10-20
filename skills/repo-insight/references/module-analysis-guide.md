@@ -45,7 +45,7 @@
 
 - 每个核心模块 → 一个独立 Agent subagent（`subagent_type: "general-purpose"`）
 - 所有次要模块 → 合并到一个 Agent subagent 批量处理
-- 所有 subagent 在同一消息中并行启动
+- 总量在会话额度内就同一消息并行启动，偏大就分批（见 SKILL.md 阶段 6）
 
 <!-- repo-insight:delegated-prompt core -->
 ### 核心模块 Subagent Prompt 模板
